@@ -6,11 +6,17 @@
 import time
 import hashlib
 
+import logging
+
 
 class Channel:
 
-    def __init__(self):
+    def __init__(self, name):
         self.id = hashlib.sha1("%s" % time.time()).hexdigest()
+        self.name = name
+
+        logging.info("%s: <%s><%s>" % (__name__, str(self.id), self.name))
+
         self.queue = []
 
     def in_q(self, event):

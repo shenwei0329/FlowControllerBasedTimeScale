@@ -5,12 +5,17 @@
 
 import time
 import hashlib
+import logging
 
 
 class Node:
 
-    def __init__(self):
+    def __init__(self, name):
         self.id = hashlib.sha1("%s" % time.time()).hexdigest()
+        self.name = name
+
+        logging.info("%s: <%s><%s>" % (__name__, str(self.id), self.name))
+
         self.function = None
         self.in_channel = []
         self.out_channel = []
@@ -27,6 +32,9 @@ class Node:
     def _do_it(self, _event):
 
         _new_event = self.function(_event)
+
+        logging.info("%s.%s >>> %s: %s" % (__name__, self.name, str(_new_event.time_scale), _new_event.data))
+
         if _new_event is not None:
             if len(self.out_channel) > 0:
 
