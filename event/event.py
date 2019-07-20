@@ -18,9 +18,12 @@ class Event:
     def get_time_scale(self):
         return self.time_scale
 
+    def set_time_scale(self, ts):
+        self.time_scale = ts
+
     def get_data(self):
         return self.data
 
-    def update_date(self, data):
+    def update_data(self, data):
         self.data = data
 

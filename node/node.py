@@ -6,6 +6,8 @@
 import time
 import hashlib
 import logging
+from register import register
+from event import event
 
 
 class Node:
@@ -13,12 +15,21 @@ class Node:
     def __init__(self, name):
         self.id = hashlib.sha1("%s" % time.time()).hexdigest()
         self.name = name
+        self.synchronizer = None
 
         logging.info("%s: <%s><%s>" % (__name__, str(self.id), self.name))
 
         self.function = None
         self.in_channel = []
         self.out_channel = []
+
+    def get_name(self):
+        return self.name
+
+    def add_synchronizer(self, sync):
+        self.synchronizer = sync
+        for _qn in self.in_channel:
+            self.synchronizer.add_channel(_qn)
 
     def add_in_channel(self, ch):
         self.in_channel.append(ch)
@@ -33,14 +44,21 @@ class Node:
 
         _new_event = self.function(_event)
 
-        logging.info("%s.%s >>> %s: %s" % (__name__, self.name, str(_new_event.time_scale), _new_event.data))
+        if _new_event is None:
+            return
+
+        # logging.info("%s.%s >>> %s: %s" % (__name__, self.name, str(_new_event.time_scale), _new_event.data))
 
         if _new_event is not None:
             if len(self.out_channel) > 0:
 
                 # 把处理结果往后传递
                 for _oq in self.out_channel:
-                    _oq.in_q(_new_event)
+                    _data = _new_event.get_data()
+                    _e = event.Event(_data)
+                    _e.set_time_scale(_new_event.get_time_scale())
+                    _q = register.R.get_channel(_oq)
+                    _q.in_q(_e)
 
     def run(self):
         """
@@ -56,9 +74,15 @@ class Node:
             self._do_it(None)
             return
 
-        for _q in self.in_channel:
+        if (self.synchronizer is not None) and (not self.synchronizer.has_sync()):
+            return
 
+        _events = []
+        for _iq in self.in_channel:
+
+            _q = register.R.get_channel(_iq)
             # to operate one event at one time.
             _event = _q.out_q()
             if _event is not None:
-                self._do_it(_event)
+                _events.append(_event)
+        self._do_it(_events)

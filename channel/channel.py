@@ -19,13 +19,23 @@ class Channel:
 
         self.queue = []
 
+    def get_name(self):
+        return self.name
+
     def in_q(self, event):
         """
         To put a event into the queue.
         :param event:
         :return:
         """
+        # print event
+        # print(">>> in_q<%s>: %d" % (self.name, event.get_data()["val"]))
         self.queue.append(event)
+
+    def get_first(self):
+        if len(self.queue) == 0:
+            return None
+        return self.queue[0]
 
     def out_q(self):
         """
@@ -34,8 +44,9 @@ class Channel:
         """
         if len(self.queue) == 0:
             return None
-
-        return self.queue.pop(0)
+        _event = self.queue.pop(0)
+        # print(">>> out_q: %s", _event.get_data())
+        return _event
 
     def insert_q(self, event):
         """
@@ -44,4 +55,7 @@ class Channel:
         :return:
         """
         self.queue.insert(0, event)
+
+    def get_size_q(self):
+        return len(self.queue)
 
