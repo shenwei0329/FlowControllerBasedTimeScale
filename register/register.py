@@ -3,7 +3,6 @@
 #   The package for register
 #
 
-
 R = None
 
 
@@ -31,4 +30,10 @@ class Register:
 
     def get_node_list(self):
         return self.node_link
+
+    def is_empty(self):
+        for _qn in self.channel_link:
+            if R.get_channel(_qn).get_size_q() > 0:
+                return False
+        return True
 

@@ -4,6 +4,7 @@
 #
 from register import register
 
+
 class Synchronizer:
 
     def __init__(self):
