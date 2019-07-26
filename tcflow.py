@@ -23,7 +23,7 @@ logging.basicConfig(filename="tcflow.log",
                     format="%(asctime)s:%(levelname)s:%(message)s",
                     datefmt="%Y-%M-%d %H:%M:%S",
                     encoding="utf-8",
-                    level=logging.DEBUG)
+                    level=logging.ERROR)
 
 
 def main():

@@ -61,6 +61,7 @@ class Node:
             return
 
         # logging.info("%s.%s >>> %s: %s" % (__name__, self.name, str(_new_event.time_scale), _new_event.data))
+        # print _new_event.data
 
         if len(self.out_channel) > 0:
 

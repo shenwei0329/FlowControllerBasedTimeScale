@@ -10,7 +10,7 @@ import logging
 class Event:
 
     def __init__(self, data):
-        self.time_scale = time.time()
+        self.time_scale = int(time.time())
         self.data = data
 
         logging.info("%s: <%s>" % (__name__, str(self.time_scale)))
