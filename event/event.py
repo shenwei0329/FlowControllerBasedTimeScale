@@ -17,6 +17,12 @@ class Event:
 
         logging.info("%s: <%s>" % (__name__, str(self.time_scale)))
 
+    def get_status(self):
+        return self.ok_status
+
+    def set_status(self, status):
+        self.ok_status = status
+
     def get_time_scale(self):
         return self.time_scale
 
