@@ -12,6 +12,8 @@ class Event:
     def __init__(self, data):
         self.time_scale = int(time.time())
         self.data = data
+        self.ok_status = True
+        self.lifetime = None
 
         logging.info("%s: <%s>" % (__name__, str(self.time_scale)))
 
