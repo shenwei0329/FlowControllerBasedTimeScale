@@ -3,8 +3,6 @@
 #   The package for register
 #
 
-R = None
-
 
 class Register:
 

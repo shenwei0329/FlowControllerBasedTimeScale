@@ -14,6 +14,10 @@
 #   补充一个异常事件并继续它的流程。
 #   3）由节点决定对含有异常时标事件的处理。
 #
+#   2019-07-30：
+#   如何考虑反馈机制，就时标而言，反馈事件是对应于当前被处理事件时标的下一个时标，就此应考虑采用
+#   一个连续的整数序列为时标基。
+#
 #
 
 import time
@@ -37,45 +41,8 @@ def main():
 
     logging.info("<%s> Starting" % __name__)
 
-    # 创建注册器实体
-    register.R = register.Register()
-
-    """构建系统"""
-    """1)创建节点"""
-    for _nd in system_a.system["node"]:
-        _n = node.Node(_nd)
-        _n.add_function(system_a.system["node"][_nd]["function"])
-        register.R.add_node(_n)
-
-        """创建输入通道"""
-        if "input" in system_a.system["node"][_nd]:
-            for _ch in system_a.system["node"][_nd]["input"]:
-                _n.add_in_channel(_ch)
-
-        """创建输出通道"""
-        if "output" in system_a.system["node"][_nd]:
-            for _ch in system_a.system["node"][_nd]["output"]:
-                _n.add_out_channel(_ch)
-
-        """创建同步器"""
-        if "synchronizer" in system_a.system["node"][_nd]:
-            if system_a.system["node"][_nd]["synchronizer"]:
-                _sync = synchronizer.Synchronizer()
-                _n.add_synchronizer(_sync)
-
-    """2)创建通道"""
-    for _ch in system_a.system["channel"]:
-        _c = channel.Channel(_ch)
-        register.R.add_channel(_c)
 
     """3)运行系统"""
-    node_link = register.R.get_node_list()
-    while True:
-        for _nd in node_link:
-            node_link[_nd].run()
-
-        if register.R.is_empty():
-            time.sleep(0)
 
 
 if __name__ == "__main__":
