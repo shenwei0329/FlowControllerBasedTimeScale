@@ -6,7 +6,6 @@
 import time
 import hashlib
 import logging
-from register import register
 from event import event
 
 
@@ -22,6 +21,7 @@ class Node:
         self.function = None
         self.in_channel = []
         self.out_channel = []
+        self.sn = None
 
     def get_name(self):
         return self.name
@@ -46,15 +46,16 @@ class Node:
     def add_function(self, func):
         self.function = func
 
-    def _do_it(self, _event):
+    def _do_it(self, _event, rg):
         """
         节点运行
         :param _event: 需要处理的输入事件组
+        :param rg: 注册器
         :return:
         """
 
         """调用处理器"""
-        _new_event = self.function(_event)
+        _new_event = self.function(_event, self.sn)
 
         if _new_event is None:
             """无输出事件时"""
@@ -70,38 +71,39 @@ class Node:
                 """获取事件数据"""
                 _data = _new_event.get_data()
                 """创建新的事件实体"""
-                _e = event.Event(_data)
-                """设置相同时标"""
-                _e.set_time_scale(_new_event.get_time_scale())
+                _e = event.Event(_new_event.get_time_scale(), _data)
                 """输出"""
-                _q = register.R.get_channel(_oq)
+                _q = rg.get_channel(_oq)
                 _q.in_q(_e)
 
-    def run(self):
+    def run(self, sn, rg):
         """
         To operate the  function of node.
+        :param sn: 时间序列
+        :param rg: 注册器
         :return: Result of event.
         """
-
+        self.sn = sn
         if self.function is None:
             return
 
         if len(self.in_channel) == 0:
             """root node"""
-            self._do_it(None)
+            self._do_it(None, rg)
             return
 
-        if (self.synchronizer is not None) and (not self.synchronizer.has_sync()):
+        if (self.synchronizer is not None) and (not self.synchronizer.has_sync(rg)):
             """有输入同步器，且输入事件未同步时"""
             return
 
         _events = []
         for _iq in self.in_channel:
 
-            _q = register.R.get_channel(_iq)
+            _q = rg.get_channel(_iq)
             # to operate one event at one time.
             _event = _q.out_q()
             if _event is not None:
                 _events.append(_event)
         if len(_events) > 0:
-            self._do_it(_events)
+            self._do_it(_events, rg)
+

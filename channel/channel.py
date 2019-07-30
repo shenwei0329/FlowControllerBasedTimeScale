@@ -2,6 +2,11 @@
 #
 #   The package for channel
 #
+#   通道可扩展远程传递：
+#   1）通过网络传递事件管理信息
+#   2）通过共享存储管理事件的数据
+#
+#
 
 import time
 import hashlib
