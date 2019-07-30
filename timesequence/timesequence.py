@@ -9,7 +9,6 @@
 #
 
 import time
-from register import register
 
 
 class TimeSequence:
@@ -20,20 +19,20 @@ class TimeSequence:
             self.ratio = 1
         else:
             self.func = time_policy["func"]
+            self.ratio = time_policy["ratio"]
+        self.sequence = 0
         self.old_ts = -1
 
     def set_ratio(self, ratio):
         if ratio >= 1:
             self.ratio = ratio
 
-    def _get(self):
-        _ts = int(self.func() * self.ratio)
-        if _ts <> self.old_ts:
-            self.old_ts = _ts
-            return _ts
-        else:
-            return None
-
-    def get_next(self, cur):
-        pass
+    def wait(self):
+        while True:
+            _ts = int(self.func() * self.ratio)
+            if _ts != self.old_ts:
+                self.old_ts = _ts
+                self.sequence += 1
+                return self.sequence-1
+            time.sleep(0.01)
 

@@ -14,6 +14,7 @@ from node import node
 from synchronizer import synchronizer
 from channel import channel
 from timesequence import timesequence
+from concurrent.futures import ThreadPoolExecutor
 
 
 class System:
@@ -22,9 +23,10 @@ class System:
         self.name = init_police['name']
         self.structure = init_police['structure']
         self.R = register.Register()
-        self.Ts = timesequence.TimeSequence(time_policy=init_police['time_policy'])
         """创建一个系统机制"""
         self._construct()
+        self.sn = None
+        self.Ts = timesequence.TimeSequence(time_policy=init_police['timer_police'])
 
     def _construct(self):
         """
@@ -59,8 +61,9 @@ class System:
             self.R.add_channel(_c)
 
     def run(self):
-        if self.Ts.
+        self.sn = self.Ts.wait()
         _link = self.R.get_node_list()
-        for _n in _link:
-            _link[_n].run()
+        with ThreadPoolExecutor(max_workers=6) as executor:
+            [executor.submit(_link[_n].run(self.sn, self.R)) for _n in _link]
+
 

@@ -11,63 +11,38 @@ from event import event
 import numpy
 import displayer
 
-random.seed = time.time()
-
-sin_ts = 0
-cos_ts = 0
-noise_ts = 0
 CoX = 80
 
 
-def sin_func(_event):
-    global sin_ts
+def timer():
+    return time.time()
 
+
+def sin_func(_event, sn):
     # print(">>> func1")
-    _ts = int(time.time()*20)
-
-    if sin_ts == _ts:
-        return None
-
-    sin_ts = _ts
     _data = {
-        "val": 6.*numpy.sin(2*numpy.pi*float(_ts)/73.3),
+        "val": 6.*numpy.sin(2*numpy.pi*float(sn)/73.3),
     }
-    return event.Event(_data)
+    return event.Event(sn, _data)
 
 
-def cos_func(_event):
-    global cos_ts
-
+def cos_func(_event, sn):
     # print(">>> func1")
-    _ts = int(time.time()*20)
-
-    if cos_ts == _ts:
-        return None
-
-    cos_ts = _ts
     _data = {
-        "val": 3.* numpy.cos(2*numpy.pi*float(_ts)/9),
+        "val": 3.*numpy.cos(2*numpy.pi*float(sn)/9),
     }
-    return event.Event(_data)
+    return event.Event(sn, _data)
 
 
-def noise(_event):
-    global noise_ts
-
+def noise(_event, sn):
     # print(">>> noise")
-    _ts = int(time.time()*20)
-
-    if noise_ts == _ts:
-        return None
-
-    noise_ts = _ts
     _data = {
         "val": 0.618 * random.uniform(-1, 1),
     }
-    return event.Event(_data)
+    return event.Event(sn, _data)
 
 
-def multi_func(events):
+def multi_func(events, sn):
     # (">>> func11"),
     _data = {"val": 0.0}
     for _e in events:
@@ -76,8 +51,7 @@ def multi_func(events):
             # print _val["val"],
             _data["val"] += _val["val"]
     # print _data["val"]
-    _e = event.Event(_data)
-    _e.set_time_scale(events[0].get_time_scale())
+    _e = event.Event(events[0].get_time_scale(), _data)
     return _e
 
 
@@ -113,7 +87,7 @@ def show(xs, formats, colors):
     # print(_str)
 
 
-def func2(_events):
+def func2(_events, sn):
     # print(">>> func2"),
     if len(_events) == 0:
         return None
@@ -201,5 +175,14 @@ system = {
         "C2.3",
         "C2.4"
     ]
+}
+
+init_police = {
+    "name": "system.a",
+    "structure": system,
+    "timer_police": {
+        "func": timer,
+        "ratio": 20,
+    }
 }
 

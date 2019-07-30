@@ -6,7 +6,6 @@
 #
 #
 
-from register import register
 from event import event
 
 
@@ -19,9 +18,10 @@ class Synchronizer:
         if channel not in self.channels:
             self.channels.append(channel)
 
-    def has_sync(self):
+    def has_sync(self, rg):
         """
         判断指定的每个输入通道是否具有同一时标的事件。
+        :param rg: 注册器
         :return:
         原则:
         1）若具有，则返回True；
@@ -35,7 +35,7 @@ class Synchronizer:
         _ts = []
         # print ">>> sync: ",
         for _qn in self.channels:
-            _q = register.R.get_channel(_qn)
+            _q = rg.get_channel(_qn)
             _e = _q.get_first()
             if _e is None:
                 # print "no event"

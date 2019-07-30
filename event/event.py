@@ -9,8 +9,8 @@ import logging
 
 class Event:
 
-    def __init__(self, data):
-        self.time_scale = int(time.time())
+    def __init__(self, sn, data):
+        self.time_scale = sn
         self.data = data
         self.ok_status = True
         self.lifetime = None
@@ -26,8 +26,8 @@ class Event:
     def get_time_scale(self):
         return self.time_scale
 
-    def set_time_scale(self, ts):
-        self.time_scale = ts
+    def set_time_scale(self, sn):
+        self.time_scale = sn
 
     def get_data(self):
         return self.data

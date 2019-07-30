@@ -20,14 +20,9 @@
 #
 #
 
-import time
 import logging
-from node import node
-from channel import channel
-from register import register
-from synchronizer import synchronizer
-
 from application import system_a
+from system import system
 
 logging.basicConfig(filename="tcflow.log",
                     filemode="w",
@@ -41,8 +36,9 @@ def main():
 
     logging.info("<%s> Starting" % __name__)
 
-
-    """3)运行系统"""
+    sys = system.System(system_a.init_police)
+    while True:
+        sys.run()
 
 
 if __name__ == "__main__":
