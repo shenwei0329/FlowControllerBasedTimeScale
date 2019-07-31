@@ -21,8 +21,11 @@
 #
 
 import logging
+from application import system_a
+from application import system_b
 from application import system_c
 from system import system
+import sys
 
 logging.basicConfig(filename="tcflow.log",
                     filemode="w",
@@ -36,9 +39,17 @@ def main():
 
     logging.info("<%s> Starting" % __name__)
 
-    sys = system.System(system_c.init_police)
+    _sys = system.System(system_a.init_police)
+    if len(sys.argv)>1:
+        if "a" in sys.argv[1]:
+            _sys = system.System(system_a.init_police)
+        elif "b" in sys.argv[1]:
+            _sys = system.System(system_b.init_police)
+        elif "c" in sys.argv[1]:
+            _sys = system.System(system_c.init_police)
+
     while True:
-        sys.run()
+        _sys.run()
 
 
 if __name__ == "__main__":

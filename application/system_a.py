@@ -2,55 +2,68 @@
 #
 #   A system for sample
 #   ===================
-#
+#   耦合振荡器
 #
 
-import random
 import time
 from event import event
 import numpy
 import displayer
 
 CoX = 80
+W0 = numpy.pi/15.
 
 
 def timer():
     return time.time()
 
 
-def sin_func(_event, sn):
-    # print(">>> func1")
-    _data = {
-        "val": 6.*numpy.sin(2*numpy.pi*float(sn)/73.3),
-    }
-    return event.Event(sn, _data)
+def z_func(events, _):
+    """
+    一阶z函数
+    :param events: 输入事件
+    :param _:
+    :return: 延迟事件
+    """
+    """延迟一个时标"""
+    return event.Event(events[0].get_time_scale()+1, {"val": events[0].get_data()["val"]})
 
 
-def cos_func(_event, sn):
-    # print(">>> func1")
-    _data = {
-        "val": 3.*numpy.cos(2*numpy.pi*float(sn)/9),
-    }
-    return event.Event(sn, _data)
+def init_event():
+    return [event.Event(0, {"val": 1.})]
 
 
-def noise(_event, sn):
-    # print(">>> noise")
-    _data = {
-        "val": 0.618 * random.uniform(-1, 1),
-    }
-    return event.Event(sn, _data)
+def sin_w0(val, sn):
+    global W0
+    return event.Event(sn, {"val": val*numpy.sin(W0)})
 
 
-def multi_func(events, sn):
-    # (">>> func11"),
-    _data = {"val": 0.0}
+def cos_w0(val, sn):
+    global W0
+    return event.Event(sn, {"val": val*numpy.cos(W0)})
+
+
+def sin_func(events, _):
+    _data = events[0].get_data()
+    return sin_w0(_data["val"], events[0].get_time_scale())
+
+
+def minus_sin_func(events, _):
+    _data = events[0].get_data()
+    return sin_w0(-_data["val"], events[0].get_time_scale())
+
+
+def cos_func(events, _):
+    _data = events[0].get_data()
+    return cos_w0(_data["val"], events[0].get_time_scale())
+
+
+def sum_node(events, _):
+    _data = {"val": 0.}
     for _e in events:
         if _e.get_status():
             _val = _e.get_data()
-            # print _val["val"],
             _data["val"] += _val["val"]
-    # print _data["val"]
     _e = event.Event(events[0].get_time_scale(), _data)
     return _e
 
@@ -87,8 +100,7 @@ def show(xs, formats, colors):
     # print(_str)
 
 
-def func2(_events, sn):
-    # print(">>> func2"),
+def outer(_events, _):
     if len(_events) == 0:
         return None
 
@@ -96,84 +108,136 @@ def func2(_events, sn):
     for _e in _events:
         __val = _e.get_data()
         if __val is not None:
-            _v.append(int(__val['val']*5.))
+            _v.append(int(__val['val']*15.))
 
     show(_v,
          [
              "*",
              "+",
-             "-",
-             "x"
+             "[",
+             "]"
          ],
          [
              "White",
-             "DarkSkyBlue",
-             "DarkGreen",
-             "DarkRed"
+             "Yellow",
+             "Red",
+             "Red"
          ])
     return None
 
 
 # 定义系统
-# 三信号源的信号经过一个“乘法器”处理后输出到展示节点
+# 耦合振荡器
 #
 system = {
     "node": {
-        "sin": {
-            "output": [
-                "C1.1",
-                "C2.3"
+        "z_node_1": {
+            "input": [
+                "C1",
             ],
-            "function": sin_func
-        },
-        "cos": {
             "output": [
-                "C1.2",
-                "C2.2"
+                "C3",
+                "C4"
+            ],
+            "function": z_func,
+        },
+        "z_node_2": {
+            "input": [
+                "C2",
+            ],
+            "output": [
+                "C5",
+                "C6"
+            ],
+            "function": z_func,
+        },
+        "cos_1": {
+            "input": [
+                "C3"
+            ],
+            "output": [
+                "C7"
             ],
             "function": cos_func
         },
-        "noise": {
-            "output": [
-                "C1.3",
-                "C2.4"
-            ],
-            "function": noise
-        },
-        "nN1": {
+        "sin_1": {
             "input": [
-                "C1.1",
-                "C1.2",
-                "C1.3",
+                "C4"
             ],
             "output": [
-                "C2.1",
+                "C8"
+            ],
+            "function": sin_func
+        },
+        "cos_2": {
+            "input": [
+                "C6"
+            ],
+            "output": [
+                "C10"
+            ],
+            "function": cos_func
+        },
+        "sin_2": {
+            "input": [
+                "C5"
+            ],
+            "output": [
+                "C9"
+            ],
+            "function": minus_sin_func
+        },
+        "sum_1": {
+            "input": [
+                "C7",
+                "C9",
+            ],
+            "output": [
+                "C1",
+                "C11"
             ],
             # 定义一个同步器
             "synchronizer": True,
-            "function": multi_func
+            "function": sum_node,
+            "init": init_event
         },
-        "N2": {
+        "sum_2": {
             "input": [
-                "C2.1",
-                "C2.2",
-                "C2.3",
-                "C2.4"
+                "C8",
+                "C10",
+            ],
+            "output": [
+                "C2",
+                "C12"
             ],
             # 定义一个同步器
             "synchronizer": True,
-            "function": func2
+            "function": sum_node,
+            "init": init_event
+        },
+        "outer": {
+            "input": [
+                "C11",
+                "C12"
+            ],
+            # 定义一个同步器
+            "synchronizer": True,
+            "function": outer
         }
     },
     "channel": [
         "C1",
-        "C1.1",
-        "C1.2",
-        "C1.3",
-        "C2.1",
-        "C2.2",
-        "C2.3",
-        "C2.4"
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "C10",
+        "C11",
+        "C12",
     ]
 }
 
