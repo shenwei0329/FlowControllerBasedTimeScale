@@ -22,6 +22,7 @@ class System:
     def __init__(self, init_police):
         self.name = init_police['name']
         self.structure = init_police['structure']
+        """每个系统都具有自己的命名管理"""
         self.R = register.Register()
         """创建一个系统机制"""
         self._construct()
@@ -33,7 +34,12 @@ class System:
         构建系统
         :return:
         """
-        """1)创建节点"""
+        """1)创建通道"""
+        for _ch in self.structure["channel"]:
+            _c = channel.Channel(_ch)
+            self.R.add_channel(_c)
+
+        """2)创建节点"""
         for _nd in self.structure["node"]:
             _n = node.Node(_nd)
             _n.add_function(self.structure["node"][_nd]["function"])
@@ -48,17 +54,17 @@ class System:
             if "output" in self.structure["node"][_nd]:
                 for _ch in self.structure["node"][_nd]["output"]:
                     _n.add_out_channel(_ch)
+                    if "init" in self.structure["node"][_nd]:
+                        _events = self.structure["node"][_nd]["init"]()
+                        _q = self.R.get_channel(_ch)
+                        for _e in _events:
+                            _q.in_q(_e)
 
             """创建同步器"""
             if "synchronizer" in self.structure["node"][_nd]:
                 if self.structure["node"][_nd]["synchronizer"]:
                     _sync = synchronizer.Synchronizer()
                     _n.add_synchronizer(_sync)
-
-        """2)创建通道"""
-        for _ch in self.structure["channel"]:
-            _c = channel.Channel(_ch)
-            self.R.add_channel(_c)
 
     def run(self):
         self.sn = self.Ts.wait()

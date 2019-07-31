@@ -2,7 +2,7 @@
 #
 #   A system for sample
 #   ===================
-#
+#   Simulation of AM
 #
 
 import random
@@ -21,7 +21,7 @@ def timer():
 def sin_func(_event, sn):
     # print(">>> func1")
     _data = {
-        "val": 6.*numpy.sin(2*numpy.pi*float(sn)/73.3),
+        "val": 1.2 + 0.8*numpy.sin(2*numpy.pi*float(sn)/100.),
     }
     return event.Event(sn, _data)
 
@@ -29,7 +29,7 @@ def sin_func(_event, sn):
 def cos_func(_event, sn):
     # print(">>> func1")
     _data = {
-        "val": 3.*numpy.cos(2*numpy.pi*float(sn)/9),
+        "val": 5.*numpy.cos(2*numpy.pi*float(sn)/10.),
     }
     return event.Event(sn, _data)
 
@@ -37,19 +37,19 @@ def cos_func(_event, sn):
 def noise(_event, sn):
     # print(">>> noise")
     _data = {
-        "val": 0.618 * random.uniform(-1, 1),
+        "val": 1. + 0.2 * random.uniform(-1, 1),
     }
     return event.Event(sn, _data)
 
 
-def multi_func(events, sn):
+def multi_func(events, _):
     # (">>> func11"),
-    _data = {"val": 0.0}
+    _data = {"val": 1.0}
     for _e in events:
         if _e.get_status():
             _val = _e.get_data()
             # print _val["val"],
-            _data["val"] += _val["val"]
+            _data["val"] *= _val["val"]
     # print _data["val"]
     _e = event.Event(events[0].get_time_scale(), _data)
     return _e
@@ -87,7 +87,7 @@ def show(xs, formats, colors):
     # print(_str)
 
 
-def func2(_events, sn):
+def func2(_events, _):
     # print(">>> func2"),
     if len(_events) == 0:
         return None
@@ -103,13 +103,17 @@ def func2(_events, sn):
              "*",
              "+",
              "-",
-             "x"
+             "x",
+             "[",
+             "]",
          ],
          [
              "White",
              "DarkSkyBlue",
              "DarkGreen",
-             "DarkRed"
+             "DarkRed",
+             "Red",
+             "Red",
          ])
     return None
 

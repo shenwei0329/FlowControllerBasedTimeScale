@@ -53,10 +53,12 @@ class Synchronizer:
                 continue
             # print("...No sync!")
             """插入失步异常事件到队列"""
+            """
             _event = event.Event(None)
             _event.set_status(False)
             _event.set_time_scale(_ts)
             __ts["q"].insert_q(_event)
+            """
 
         return False
 

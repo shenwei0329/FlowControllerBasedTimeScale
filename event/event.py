@@ -10,9 +10,16 @@ import logging
 class Event:
 
     def __init__(self, sn, data):
+        """
+        构建一个事件实体
+        :param sn: 时标
+        :param data: 数据
+        """
         self.time_scale = sn
         self.data = data
+        """事件状态"""
         self.ok_status = True
+        """事件寿命"""
         self.lifetime = None
 
         logging.info("%s: <%s>" % (__name__, str(self.time_scale)))
