@@ -25,6 +25,7 @@ from application import system_a
 from application import system_b
 from application import system_c
 from system import system
+from displayer import displayer
 import sys
 
 logging.basicConfig(filename="tcflow.log",
@@ -40,7 +41,9 @@ def main():
     logging.info("<%s> Starting" % __name__)
 
     _sys = system.System(system_a.init_police)
-    if len(sys.argv)>1:
+    _displayer = displayer.Displayer()
+
+    if len(sys.argv) > 1:
         if "a" in sys.argv[1]:
             _sys = system.System(system_a.init_police)
         elif "b" in sys.argv[1]:

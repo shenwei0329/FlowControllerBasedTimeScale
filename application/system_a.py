@@ -8,10 +8,43 @@
 import time
 from event import event
 import numpy
-import displayer
+from displayer import displayer
 
 CoX = 80
 W0 = numpy.pi/15.
+Outer = displayer.Displayer()
+
+
+def show(xs, formats, colors):
+    global CoX
+
+    _str = " " * CoX * 2
+    _str = _str[:CoX-1] + '|' + _str[CoX:]
+
+    # print xs, formats
+
+    for _xx in xs:
+        _idx = xs.index(_xx)
+        _x = CoX + _xx
+        if _x > 0:
+            if _x < (CoX*2 - 1):
+                _str = _str[:_x-1] + formats[_idx] + _str[_x:]
+            else:
+                _str = _str[:-1] + "]"
+        else:
+            _str = "[" + _str[1:]
+
+    for _s in _str:
+        if _s != ' ':
+            if _s == '|':
+                Outer.printColorIdx("DarkWhite", _s)
+            else:
+                _idx = formats.index(_s)
+                Outer.printColorIdx(colors[_idx], _s)
+        else:
+            Outer.printColorIdx("DarkBlue", " ")
+    print("")
+    # print(_str)
 
 
 def timer():
@@ -66,38 +99,6 @@ def sum_node(events, _):
             _data["val"] += _val["val"]
     _e = event.Event(events[0].get_time_scale(), _data)
     return _e
-
-
-def show(xs, formats, colors):
-    global CoX
-
-    _str = " " * CoX * 2
-    _str = _str[:CoX-1] + '|' + _str[CoX:]
-
-    # print xs, formats
-
-    for _xx in xs:
-        _idx = xs.index(_xx)
-        _x = CoX + _xx
-        if _x > 0:
-            if _x < (CoX*2 - 1):
-                _str = _str[:_x-1] + formats[_idx] + _str[_x:]
-            else:
-                _str = _str[:-1] + "]"
-        else:
-            _str = "[" + _str[1:]
-
-    for _s in _str:
-        if _s != ' ':
-            if _s == '|':
-                displayer.printDarkWhite(_s)
-            else:
-                _idx = formats.index(_s)
-                displayer.printColorIdx(_s, colors[_idx])
-        else:
-            displayer.printDarkBlue(' ')
-    print("")
-    # print(_str)
 
 
 def outer(_events, _):
