@@ -21,6 +21,8 @@ class TimeSequence:
             self.func = time_policy["func"]
             self.ratio = time_policy["ratio"]
         self.sequence = 0
+        if "ts" in time_policy:
+            self.sequence = time_policy["ts"]
         self.old_ts = -1
 
     def set_ratio(self, ratio):

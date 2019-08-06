@@ -24,6 +24,7 @@ import logging
 from application import system_a
 from application import system_b
 from application import system_c
+from application import system_d
 from system import system
 from displayer import displayer
 import sys
@@ -50,6 +51,8 @@ def main():
             _sys = system.System(system_b.init_police)
         elif "c" in sys.argv[1]:
             _sys = system.System(system_c.init_police)
+        elif "d" in sys.argv[1]:
+            _sys = system.System(system_d.init_police)
 
     while True:
         _sys.run()
