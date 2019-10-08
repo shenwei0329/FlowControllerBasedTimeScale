@@ -12,6 +12,8 @@ from displayer import displayer
 
 CoX = 80
 W0 = numpy.pi/15.
+sin_W0 = numpy.sin(W0)
+cos_W0 = numpy.cos(W0)
 Outer = displayer.Displayer()
 
 
@@ -42,7 +44,7 @@ def show(xs, formats, colors):
                 _idx = formats.index(_s)
                 Outer.printColorIdx(colors[_idx], _s)
         else:
-            Outer.printColorIdx("DarkBlue", " ")
+            Outer.printColorIdx("White", " ")
     print("")
     # print(_str)
 
@@ -67,13 +69,13 @@ def init_event():
 
 
 def sin_w0(val, sn):
-    global W0
-    return event.Event(sn, {"val": val*numpy.sin(W0)})
+    global sin_W0
+    return event.Event(sn, {"val": val*sin_W0})
 
 
 def cos_w0(val, sn):
-    global W0
-    return event.Event(sn, {"val": val*numpy.cos(W0)})
+    global cos_W0
+    return event.Event(sn, {"val": val*cos_W0})
 
 
 def sin_func(events, _):
@@ -101,6 +103,16 @@ def sum_node(events, _):
     return _e
 
 
+def mix_node(events, _):
+    _data = {"val": 1.}
+    for _e in events:
+        if _e.get_status():
+            _val = _e.get_data()
+            _data["val"] *= _val["val"]
+    _e = event.Event(events[0].get_time_scale(), _data)
+    return _e
+
+
 def outer(_events, _):
     if len(_events) == 0:
         return None
@@ -115,12 +127,14 @@ def outer(_events, _):
          [
              "*",
              "+",
+             "x",
              "[",
              "]"
          ],
          [
              "White",
              "Yellow",
+             "Red",
              "Red",
              "Red"
          ])
@@ -195,7 +209,8 @@ system = {
             ],
             "output": [
                 "C1",
-                "C11"
+                "C11",
+                "C31"
             ],
             # 定义一个同步器
             "synchronizer": True,
@@ -209,17 +224,31 @@ system = {
             ],
             "output": [
                 "C2",
-                "C12"
+                "C12",
+                "C32"
             ],
             # 定义一个同步器
             "synchronizer": True,
             "function": sum_node,
             "init": init_event
         },
+        "mix": {
+            "input": [
+                "C31",
+                "C32"
+            ],
+            "output": [
+                "C33"
+            ],
+            # 定义一个同步器
+            "synchronizer": True,
+            "function": mix_node,
+        },
         "outer": {
             "input": [
                 "C11",
-                "C12"
+                "C12",
+                "C33"
             ],
             # 定义一个同步器
             "synchronizer": True,
@@ -239,6 +268,9 @@ system = {
         "C10",
         "C11",
         "C12",
+        "C31",
+        "C32",
+        "C33",
     ]
 }
 

@@ -12,6 +12,8 @@ from displayer import displayer
 
 CoX = 80
 W0 = numpy.pi/15.
+sin_W0 = numpy.sin(W0)
+cos_W0 = numpy.cos(W0)
 A = 1.0
 MAX = 0.
 Outer = displayer.Displayer()
@@ -54,7 +56,7 @@ def timer():
 
 
 def q_func(_event, sn):
-    global W0, A
+    global sin_W0, A
     """
     单位脉冲信号发生器
     :param _event: 
@@ -62,7 +64,7 @@ def q_func(_event, sn):
     :return: 
     """
     _data = {
-        "val": A*numpy.sin(W0),
+        "val": A*sin_W0,
     }
     return event.Event(sn, _data)
 
@@ -102,9 +104,9 @@ def init_node_b():
 
 
 def node_c(_events, _):
-    global W0
+    global cos_W0
     _data = _events[0].get_data()
-    _e = event.Event(_events[0].get_time_scale(), {"val": _data["val"] * (2.0*numpy.cos(W0))})
+    _e = event.Event(_events[0].get_time_scale(), {"val": _data["val"] * (2.0*cos_W0)})
     return _e
 
 

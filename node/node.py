@@ -65,16 +65,16 @@ class Node:
         # print _new_event.data
 
         if len(self.out_channel) > 0:
-
+            _cnt = len(self.out_channel)
             """把处理结果往后传递"""
             for _oq in self.out_channel:
-                """获取事件数据"""
-                _data = _new_event.get_data()
-                """创建新的事件实体"""
-                _e = event.Event(_new_event.get_time_scale(), _data)
                 """输出"""
                 _q = rg.get_channel(_oq)
-                _q.in_q(_e)
+                _q.in_q(_new_event)
+                _cnt -= 1
+                if _cnt > 0:
+                    """多个通道时，须复制事件"""
+                    _new_event = _new_event.copy()
 
     def run(self, sn, rg):
         """

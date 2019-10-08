@@ -5,6 +5,7 @@
 
 import time
 import logging
+import copy
 
 
 class Event:
@@ -41,4 +42,11 @@ class Event:
 
     def update_data(self, data):
         self.data = data
+
+    def copy(self):
+        """
+        复制自己
+        :return: 复制品
+        """
+        return copy.copy(self)
 
